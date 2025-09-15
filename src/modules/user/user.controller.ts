@@ -67,7 +67,7 @@ export const logout = async (
       path: "/",
     });
 
-    res.json({ message: "Logout successful" });
+    res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     next(error);
   }

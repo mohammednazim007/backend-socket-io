@@ -2,7 +2,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-//**  To access data from frontend
+//** Auth Middleware for protecting routes
+
 export const authMiddleware = (
   req: Request,
   res: Response,
