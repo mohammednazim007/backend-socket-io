@@ -1,6 +1,7 @@
 import User from "./user.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 // ** Create User with name, email and password
 export const createUser = async (
@@ -29,6 +30,25 @@ export const loginUser = async (email: string, password: string) => {
   });
 
   return { token, user };
+};
+
+// ** Get all Friends
+export const getCurrentRelatedFriends = async (userId: string) => {
+  const friends = await User.aggregate([
+    {
+      $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) } },
+    },
+    {
+      $project: {
+        __v: 0,
+        password: 0,
+      },
+    },
+  ]);
+
+  if (!friends) throw new Error("Friend is not found");
+
+  return friends;
 };
 
 //** profile image upload service

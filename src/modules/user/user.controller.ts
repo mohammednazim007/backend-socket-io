@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import {
   createUser,
+  getCurrentRelatedFriends,
   getCurrentUser,
   loginUser,
   updateUserProfileImage,
@@ -90,8 +91,27 @@ export const getCurrent = async (
   }
 };
 
+// ** Get All active related Friends
+export const getRelatedFriends = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const relatedFriend = await getCurrentRelatedFriends(
+      req.user?.id as string
+    );
+
+    res
+      .status(200)
+      .json({ message: "Friends fetched successfully", relatedFriend });
+  } catch (error) {
+    next(error);
+  }
+};
+
 //** profile image upload
-export const updateProfile = async (
+export const updateUserProfile = async (
   req: Request,
   res: Response,
   next: NextFunction
