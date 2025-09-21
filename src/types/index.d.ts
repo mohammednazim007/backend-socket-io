@@ -3,8 +3,7 @@ declare global {
   namespace Express {
     interface Request {
       user?: {
-        _id: string;
-        email: string;
+        id: string;
         iat?: number;
         exp?: number;
       };

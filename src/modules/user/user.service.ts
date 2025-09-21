@@ -69,7 +69,7 @@ export const updateUserProfileImage = async (
 
 // ** get the current user by id
 export const getCurrentUser = async (userId: string) => {
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).select("-password");
 
   if (!user) throw new Error("User not found");
 
