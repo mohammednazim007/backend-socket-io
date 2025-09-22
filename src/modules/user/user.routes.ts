@@ -21,7 +21,12 @@ router.post("/login", validateRequest(loginSchema), login);
 //**  Protected routes (require authentication)
 router.get("/current-user", authMiddleware, getCurrent);
 router.get("/related-friends/:id", authMiddleware, getRelatedFriends);
-router.post("/profile", upload.single("image"), updateUserProfile);
+router.post(
+  "/profile",
+  authMiddleware,
+  upload.single("image"),
+  updateUserProfile
+);
 router.get("/logout", logout);
 
 export default router;

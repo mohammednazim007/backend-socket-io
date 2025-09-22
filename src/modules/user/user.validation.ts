@@ -9,6 +9,7 @@ export const registerSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters long"),
     email: z.string().regex(emailRegex, "Please enter a valid email address"),
     password: z.string().regex(passwordRegex, "Password is too weak"),
+    avatar: z.string().optional(),
   }),
 });
 

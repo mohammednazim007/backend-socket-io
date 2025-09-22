@@ -4,9 +4,10 @@ import {
   getCurrentRelatedFriends,
   getCurrentUser,
   loginUser,
-  updateUserProfileImage,
 } from "./user.service";
 import { getCookieOptions } from "../../utils/get-cookie-options";
+import User from "./user.model";
+import bcrypt from "bcryptjs";
 
 // ** Register User with name, email and password
 export const register = async (
@@ -15,8 +16,8 @@ export const register = async (
   next: NextFunction
 ) => {
   try {
-    const { name, email, password } = req.body;
-    const user = await createUser(name, email, password);
+    const { name, email, password, avatar } = req.body;
+    const user = await createUser(name, email, password, avatar);
 
     res.status(201).json(user);
   } catch (error) {
@@ -40,12 +41,7 @@ export const login = async (
     // Return user data without token (token is now in cookie)
     res.status(200).json({
       message: "Login successful",
-      user: {
-        _id: result.user._id,
-        name: result.user.name,
-        email: result.user.email,
-        // token: result.token,
-      },
+      user: result.user,
     });
   } catch (error) {
     next(error);
@@ -116,15 +112,43 @@ export const updateUserProfile = async (
   next: NextFunction
 ) => {
   try {
+    const userId = (req as any).user?.id; // assume JWT middleware sets req.user
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const { name, password } = req.body;
     const file = req.file as Express.Multer.File & {
       path?: string;
       filename?: string;
     };
 
-    res.json({
-      success: true,
-      url: (file as any).path, // Cloudinary URL
-      public_id: (file as any).filename, // Cloudinary public ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // update fields if provided
+    if (name) user.name = name;
+    if (password) {
+      user.password = await bcrypt.hash(password, 10);
+    }
+    if (file?.path) {
+      user.avatar = file.path; // Cloudinary URL
+    }
+
+    await user.save();
+
+    return res.status(201).json({
+      message: "Profile updated successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+      },
     });
   } catch (error) {
     next(error);

@@ -26,6 +26,7 @@ export const authMiddleware = (
       token,
       process.env.JWT_SECRET as string
     ) as Express.Request["user"]; // ✅ cast to our custom type
+    console.log("decoded", decoded);
 
     req.user = decoded; // ✅ no more TypeScript error
     next();

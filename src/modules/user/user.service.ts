@@ -7,13 +7,20 @@ import mongoose from "mongoose";
 export const createUser = async (
   name: string,
   email: string,
-  password: string
+  password: string,
+  avatar: string
 ) => {
   const userExists = await User.findOne({ email });
   if (userExists) throw new Error("User with this email already exists");
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await User.create({ name, email, password: hashedPassword });
+  const user = await User.create({
+    name,
+    email,
+    avatar: "",
+    password: hashedPassword,
+  });
+
   return user;
 };
 
@@ -29,7 +36,11 @@ export const loginUser = async (email: string, password: string) => {
     expiresIn: "1d",
   });
 
-  return { token, user };
+  // Convert Mongoose document to plain object
+  const userObj = user.toObject();
+  delete userObj.password; // remove password
+
+  return { token, user: userObj };
 };
 
 // ** Get all Friends
@@ -70,6 +81,7 @@ export const updateUserProfileImage = async (
 // ** get the current user by id
 export const getCurrentUser = async (userId: string) => {
   const user = await User.findById(userId).select("-password");
+  console.log("current user ", user);
 
   if (!user) throw new Error("User not found");
 
