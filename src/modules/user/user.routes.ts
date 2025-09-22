@@ -5,11 +5,12 @@ import {
   logout,
   getCurrent,
   getRelatedFriends,
+  updateUserProfile,
 } from "./user.controller";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { loginSchema, registerSchema } from "./user.validation";
-import { upload } from "../../middlewares/multer.middleware";
+import { upload } from "../../cloudinary/upload";
 
 const router: Router = express.Router();
 
@@ -20,7 +21,7 @@ router.post("/login", validateRequest(loginSchema), login);
 //**  Protected routes (require authentication)
 router.get("/current-user", authMiddleware, getCurrent);
 router.get("/related-friends/:id", authMiddleware, getRelatedFriends);
-router.get("/profile", authMiddleware, upload.single("image"));
+router.put("/profile", upload.single("image"), updateUserProfile);
 router.get("/logout", logout);
 
 export default router;

@@ -7,7 +7,6 @@ import {
   updateUserProfileImage,
 } from "./user.service";
 import { getCookieOptions } from "../../utils/get-cookie-options";
-import { cloudinaryUploader } from "../../config/cloudinary";
 
 // ** Register User with name, email and password
 export const register = async (
@@ -117,16 +116,16 @@ export const updateUserProfile = async (
   next: NextFunction
 ) => {
   try {
-    const { userId, name } = req.body;
-    let imageUrl = "";
+    const file = req.file as Express.Multer.File & {
+      path?: string;
+      filename?: string;
+    };
 
-    if (req.file) {
-      imageUrl = await cloudinaryUploader(req.file.path);
-    }
-
-    const result = await updateUserProfileImage(userId, name, imageUrl);
-
-    res.json(result);
+    res.json({
+      success: true,
+      url: (file as any).path, // Cloudinary URL
+      public_id: (file as any).filename, // Cloudinary public ID
+    });
   } catch (error) {
     next(error);
   }
