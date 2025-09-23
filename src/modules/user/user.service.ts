@@ -63,17 +63,38 @@ export const getCurrentRelatedFriends = async (userId: string) => {
 };
 
 //** profile image upload service
-export const updateUserProfileImage = async (
+export const updateProfile = async (
   userId: string,
-  name: string,
-  profileUrl: string
+  file?: Express.Multer.File & { path?: string; filename?: string },
+  currentPassword?: string,
+  newPassword?: string,
+  name?: string
 ) => {
-  const user = await User.findByIdAndUpdate(
-    userId,
-    { name, profileUrl },
-    { new: true }
-  );
-  if (!user) throw new Error("User not found");
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Update name
+  if (name) {
+    user.name = name;
+  }
+
+  // Handle password update if currentPassword + newPassword are provided
+  if (currentPassword && newPassword) {
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      throw new Error("Current password is incorrect");
+    }
+    user.password = await bcrypt.hash(newPassword, 10);
+  }
+
+  // Handle avatar upload
+  if (file?.path) {
+    user.avatar = file.path; // could be Cloudinary URL if uploaded before
+  }
+
+  await user.save();
 
   return user;
 };

@@ -4,6 +4,7 @@ import {
   getCurrentRelatedFriends,
   getCurrentUser,
   loginUser,
+  updateProfile,
 } from "./user.service";
 import { getCookieOptions } from "../../utils/get-cookie-options";
 import User from "./user.model";
@@ -105,7 +106,7 @@ export const getRelatedFriends = async (
   }
 };
 
-//** profile image upload
+// ** profile image upload
 export const updateUserProfile = async (
   req: Request,
   res: Response,
@@ -117,31 +118,21 @@ export const updateUserProfile = async (
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const { name, password } = req.body;
+    const { name, currentPassword, newPassword } = req.body;
     const file = req.file as Express.Multer.File & {
       path?: string;
       filename?: string;
     };
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
+    const user = await updateProfile(
+      userId,
+      file,
+      currentPassword,
+      newPassword,
+      name
+    );
 
-    // update fields if provided
-    if (name) user.name = name;
-    if (password) {
-      user.password = await bcrypt.hash(password, 10);
-    }
-    if (file?.path) {
-      user.avatar = file.path; // Cloudinary URL
-    }
-
-    await user.save();
-
-    return res.status(201).json({
+    return res.status(200).json({
       message: "Profile updated successfully",
       user: {
         _id: user._id,
@@ -150,7 +141,7 @@ export const updateUserProfile = async (
         avatar: user.avatar,
       },
     });
-  } catch (error) {
-    next(error);
+  } catch (error: any) {
+    return res.status(400).json({ success: false, message: error.message });
   }
 };
