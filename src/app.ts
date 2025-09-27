@@ -7,7 +7,6 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./modules/user/user.routes";
 import { errorHandler } from "./middlewares/error.middleware";
 import { healthRoute } from "./middlewares/healthMiddleware";
-import messageRoutes from "./modules/message/message.routes"; // new
 
 const app: Application = express();
 
@@ -32,7 +31,6 @@ app.get("/health", healthRoute);
 
 // Routes
 app.use("/api/v1/user", userRoutes);
-app.use("/messages", messageRoutes);
 
 // Global Health & Error Handler
 app.use(errorHandler);

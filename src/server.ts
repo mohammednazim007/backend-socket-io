@@ -1,9 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
-import http from "http";
 import connectDB from "./config/db";
 import app from "./app";
-import { initSocket } from "./socket/socket-io";
 
 const PORT = process.env.PORT || 5000;
 
@@ -11,10 +9,7 @@ const startServer = async () => {
   try {
     await connectDB();
 
-    const server = http.createServer(app); // ✅ create HTTP server
-    initSocket(server); // ✅ attach Socket.IO
-
-    server.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });
   } catch (err) {
