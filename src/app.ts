@@ -32,7 +32,7 @@ app.get("/health", healthRoute);
 
 // Routes
 app.use("/api/v1/user", userRoutes);
-app.use("/api/v1/messages", messageRoutes);
+app.use("/messages", messageRoutes);
 
 // Global Health & Error Handler
 app.use(errorHandler);
