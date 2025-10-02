@@ -1,3 +1,4 @@
+import { getReceiverSocketId, io } from "../../socket/socket-io";
 import { IMessage } from "./message.interface";
 import Message from "./message.model";
 import { v2 as cloudinary } from "cloudinary";
@@ -55,6 +56,12 @@ export const sendMessage = async (message: IMessage) => {
     text,
     media: uploadedMediaUrl, // store secure_url in DB
   });
+
+  // ✅ Emit message to receiver socket
+  const receiverSocketId = getReceiverSocketId(receiver_id);
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("new_message", newMessage);
+  }
 
   return newMessage;
 };
