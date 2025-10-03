@@ -29,15 +29,17 @@ export const sendMessageController = async (
   next: NextFunction
 ) => {
   try {
-    const file = req.file as Express.Multer.File & {
-      path?: string;
-      filename?: string;
-    };
+    // Text comes from body
+    const text = req.body.text;
+
+    // File comes from multer
+    const file = req.file as Express.Multer.File | undefined;
 
     const message = await sendMessage({
-      ...req.body,
-      sender_id: req.params.sender_id,
-      media: file?.path, // multer gives local file path
+      text,
+      sender_id: req.user?.id as string,
+      receiver_id: req.params.sender_id,
+      media: file?.path, // multer gives local path
     });
 
     return res.status(201).json({

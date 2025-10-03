@@ -23,6 +23,7 @@ export const getMessages = async (receiver_id: string, user_id: string) => {
 // ✅ Send message between two users
 export const sendMessage = async (message: IMessage) => {
   const { sender_id, receiver_id, text, media } = message;
+  console.log("message ", message);
 
   if (!sender_id || !receiver_id) {
     throw new Error("Sender ID and Receiver ID are required");
