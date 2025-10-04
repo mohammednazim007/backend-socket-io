@@ -11,7 +11,7 @@ export const sendMessage = async (
 ) => {
   try {
     const { sender_id, text } = req.body;
-    const { receiver_id } = req.params;
+    const { receiver_id } = req.params; // comes from URL
 
     // Type guard
     if (!sender_id || !receiver_id) {
@@ -41,6 +41,7 @@ export const sendMessage = async (
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("new_message", newMessage);
     }
+    console.log(newMessage);
 
     return res.status(201).json({
       message: "Message sent successfully",
