@@ -57,7 +57,7 @@ export const getChatHistory = async (
   next: NextFunction
 ) => {
   try {
-    const { sender_id, receiver_id } = req.query;
+    const { sender_id, receiver_id } = req.body;
 
     if (!sender_id || !receiver_id) {
       return res
@@ -70,7 +70,9 @@ export const getChatHistory = async (
       receiver_id as string
     );
 
-    res.status(200).json({ data: messages });
+    res
+      .status(200)
+      .json({ messages: "Chat history fetched successfully", data: messages });
   } catch (error) {
     next(error);
   }
