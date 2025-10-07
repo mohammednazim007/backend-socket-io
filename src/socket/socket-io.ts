@@ -24,7 +24,24 @@ export const initSocket = (server: HttpServer) => {
       console.log(`✅ User connected: ${uid} (${socket.id})`);
     }
 
+    // ** Emit online users to all clients
     io.emit("get_online_users", Object.keys(userSocketMap));
+
+    // ** Handle typing events
+    socket.on("typing", ({ sender_id, receiver_id }) => {
+      const receiverSocketId = userSocketMap[receiver_id];
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("user_typing", sender_id);
+      }
+    });
+
+    // ** Handle stop typing events
+    socket.on("stop_typing", ({ sender_id, receiver_id }) => {
+      const receiverSocketId = userSocketMap[receiver_id];
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("user_stop_typing", sender_id);
+      }
+    });
 
     socket.on("disconnect", () => {
       console.log(`❌ User disconnected: ${uid}`);
