@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
+import Message from "../modules/message/message.model";
 
 const userSocketMap: Record<string, string> = {};
 let io: Server;
@@ -40,6 +41,19 @@ export const initSocket = (server: HttpServer) => {
       const receiverSocketId = userSocketMap[receiver_id];
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("user_stop_typing", sender_id);
+      }
+    });
+
+    // ✅ Mark messages as read
+    socket.on("mark_as_read", async ({ sender_id, receiver_id }) => {
+      await Message.updateMany(
+        { sender_id, receiver_id, isRead: false },
+        { $set: { isRead: true } }
+      );
+
+      const senderSocketId = userSocketMap[sender_id];
+      if (senderSocketId) {
+        io.to(senderSocketId).emit("messages_seen", { reader_id: receiver_id });
       }
     });
 

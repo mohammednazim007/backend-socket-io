@@ -4,6 +4,7 @@ import cloudinary from "../../cloudinary/cloudinary";
 import { createMessage, getMessages } from "./message.service";
 import mongoose from "mongoose";
 
+// ✅ Send message
 export const sendMessage = async (
   req: Request,
   res: Response,
