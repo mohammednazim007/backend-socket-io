@@ -22,7 +22,7 @@ export const sendMessage = async (
     }
 
     let mediaPath: string | undefined;
-
+    console.log("data", req.file);
     // ✅ Handle image upload if present
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path);

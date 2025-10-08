@@ -6,6 +6,7 @@ export const createMessage = async (
   data: Partial<IMessage>
 ): Promise<IMessage> => {
   const message = await Message.create(data);
+
   // return message.populate(["sender_id", "receiver_id"]);
   return message;
 };
