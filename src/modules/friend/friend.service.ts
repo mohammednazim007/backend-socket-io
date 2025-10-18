@@ -21,10 +21,13 @@ export const sendRequest = async (senderId: string, receiverId: string) => {
   sender.sentRequests.push(receiverId);
   receiver.friendRequests.push(senderId);
 
-  await sender.save();
-  await receiver.save();
+  const updatedSender = await sender.save();
+  const updatedReceiver = await receiver.save();
 
-  return { message: "Friend request sent" };
+  return {
+    message: "Friend request sent",
+    data: { sender: updatedSender, receiver: updatedReceiver },
+  };
 };
 
 // ** Accept friend request

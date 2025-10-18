@@ -20,7 +20,7 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
   try {
     const { senderId, receiverId } = req.body;
     const result = await sendRequest(senderId, receiverId);
-    res.status(200).json(result);
+    res.status(201).json(result);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }

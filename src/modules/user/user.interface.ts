@@ -5,7 +5,6 @@ export interface IUser {
   password: string;
   avatar: string | null;
   isFriend: boolean;
-  isPending: boolean;
 
   friends: string[]; // IDs of accepted friends
   friendRequests: string[]; // IDs of incoming friend requests
