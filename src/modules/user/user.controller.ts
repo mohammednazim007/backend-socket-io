@@ -97,7 +97,10 @@ export const getRelatedFriends = async (
 
     res
       .status(200)
-      .json({ message: "Friends fetched successfully", relatedFriend });
+      .json({
+        message: "Friends fetched successfully",
+        friends: relatedFriend,
+      });
   } catch (error) {
     next(error);
   }

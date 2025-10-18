@@ -47,7 +47,10 @@ export const loginUser = async (email: string, password: string) => {
 export const getCurrentRelatedFriends = async (userId: string) => {
   const friends = await User.aggregate([
     {
-      $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) } },
+      $match: {
+        _id: { $ne: new mongoose.Types.ObjectId(userId) },
+        friends: { $in: [userId] },
+      },
     },
     {
       $project: {
