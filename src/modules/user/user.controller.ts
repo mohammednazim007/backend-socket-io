@@ -95,12 +95,10 @@ export const getRelatedFriends = async (
     const userId = (req as any).user.id as string;
     const relatedFriend = await getCurrentRelatedFriends(userId);
 
-    res
-      .status(200)
-      .json({
-        message: "Friends fetched successfully",
-        friends: relatedFriend,
-      });
+    return res.status(200).json({
+      message: "Friends fetched successfully",
+      friends: relatedFriend,
+    });
   } catch (error) {
     next(error);
   }

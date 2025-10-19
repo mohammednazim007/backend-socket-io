@@ -3,6 +3,7 @@ dotenv.config();
 import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
 import Message from "../modules/message/message.model";
+import Notification from "../modules/notification/notification.model";
 
 const userSocketMap: Record<string, string> = {};
 let io: Server;
@@ -16,7 +17,7 @@ export const initSocket = (server: HttpServer) => {
     },
   });
 
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     const user_id = socket.handshake.query.user_id;
     const uid = Array.isArray(user_id) ? user_id[0] : user_id;
 
@@ -56,6 +57,40 @@ export const initSocket = (server: HttpServer) => {
         io.to(senderSocketId).emit("messages_seen", { reader_id: receiver_id });
       }
     });
+
+    //✅  When user reconnects
+    if (uid) {
+      userSocketMap[uid] = socket.id;
+      console.log(`✅ User connected: ${uid} (${socket.id})`);
+
+      // ✅ Send any unread notifications when user comes online
+      try {
+        const unreadNotifications = await Notification.find({
+          receiverId: uid,
+          isRead: false,
+        }).sort({ createdAt: -1 });
+
+        if (unreadNotifications.length > 0) {
+          socket.emit("unread_notifications", unreadNotifications);
+        }
+      } catch (err) {
+        console.error("Error fetching unread notifications:", err);
+      }
+    }
+    // ✅ Optional: mark notifications as read
+    socket.on(
+      "mark_notifications_as_read",
+      async (notificationIds: string[]) => {
+        try {
+          await Notification.updateMany(
+            { _id: { $in: notificationIds } },
+            { $set: { isRead: true } }
+          );
+        } catch (err) {
+          console.error("Error marking notifications as read:", err);
+        }
+      }
+    );
 
     socket.on("disconnect", () => {
       console.log(`❌ User disconnected: ${uid}`);

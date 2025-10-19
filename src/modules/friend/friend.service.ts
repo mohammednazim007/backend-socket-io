@@ -1,3 +1,5 @@
+import { getReceiverSocketId, io } from "../../socket/socket-io";
+import Notification from "../notification/notification.model";
 import User from "../user/user.model";
 
 // ** Send friend request
@@ -23,6 +25,26 @@ export const sendRequest = async (senderId: string, receiverId: string) => {
 
   const updatedSender = await sender.save();
   const updatedReceiver = await receiver.save();
+
+  // ✅ 1. Create a persistent notification
+  const notification = await Notification.create({
+    senderId,
+    receiverId,
+    type: "friend_request",
+    message: `${sender.name} sent you a friend request.`,
+  });
+
+  // ✅ 2. If receiver online, send real-time notification
+  const receiverSocketId = getReceiverSocketId(receiverId);
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("friend_request_received", {
+      senderId,
+      senderName: sender.name,
+      message: notification.message,
+      notificationId: notification._id,
+      createdAt: notification.createdAt,
+    });
+  }
 
   return {
     message: "Friend request sent",

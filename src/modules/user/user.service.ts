@@ -105,7 +105,6 @@ export const updateProfile = async (
 // ** get the current user by id
 export const getCurrentUser = async (userId: string) => {
   const user = await User.findById(userId).select("-password");
-  console.log("current user ", user);
 
   if (!user) throw new Error("User not found");
 
