@@ -5,18 +5,16 @@ import {
   getSentRequests,
   getNonFriendUsers,
 } from "./friend.service";
-import User from "../user/user.model";
 
-// ** Get the all friends
-export const getAllFriends = async (req: Request, res: Response) => {
-  const userId = (req as any).user.id as string;
-  const users = await User.find({ _id: { $ne: userId } });
-
-  if (!users) throw new Error("Users not found");
-  res.status(200).json({
-    message: "Users found",
-    users,
-  });
+// ** Get all non-friend users
+export const getAllNonFriendUsers = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id as string;
+    const result = await getNonFriendUsers(userId);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
 };
 
 // ** Send friend request
@@ -35,17 +33,6 @@ export const getSentFriendRequests = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id as string;
     const result = await getSentRequests(userId);
-    res.status(200).json(result);
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-// ** Get all non-friend users
-export const getAllNonFriendUsers = async (req: Request, res: Response) => {
-  try {
-    const userId = (req as any).user.id as string;
-    const result = await getNonFriendUsers(userId);
     res.status(200).json(result);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
