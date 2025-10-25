@@ -56,21 +56,33 @@ export const sendRequest = async (senderId: string, receiverId: string) => {
   };
 };
 
-// ** Get sent friend requests
-export const getSentRequests = async (userId: string) => {
-  const user = await User.findById(userId);
-  if (!user) throw new Error("User not found");
+// ** Get accepted friend requests
+export const acceptedFriend = async (userId: string) => {
+  const userExists = await User.exists({ _id: userId });
+  if (!userExists) throw new Error("User not found");
 
-  // Populate the sent requests with user details
-  const populatedUser = await User.findById(userId).populate(
-    "sentRequests",
-    "name email avatar"
-  );
+  const populatedUser = await User.findById(userId).populate({
+    path: "friends",
+    select: "-password",
+  });
 
   return {
     message: "Sent friend requests retrieved successfully",
-    sentRequests: populatedUser?.sentRequests || [],
+    users: populatedUser?.friends || [],
   };
+  // const user = await User.findById(userId);
+  // if (!user) throw new Error("User not found");
+
+  // // Populate the sent requests with user details
+  // const populatedUser = await User.findById(userId).populate(
+  //   "sentRequests",
+  //   "name email avatar"
+  // );
+
+  // return {
+  //   message: "Sent friend requests retrieved successfully",
+  //   sentRequests: populatedUser?.sentRequests || [],
+  // };
 };
 
 // ** Get all non-friend users
@@ -128,26 +140,29 @@ export const cancelRequest = async (senderId: string, receiverId: string) => {
 };
 
 // POST /friends/accept
-// export const acceptFriendRequest = async (req, res) => {
-//   const { senderId, receiverId } = req.body;
-//   const sender = await User.findById(senderId);
-//   const receiver = await User.findById(receiverId);
+export const acceptRequest = async (senderId: string, receiverId: string) => {
+  const sender = await User.findById(senderId);
+  const receiver = await User.findById(receiverId);
 
-//   if (!sender || !receiver) return res.status(404).json({ message: "User not found" });
+  if (!sender || !receiver) throw new Error("User not found");
 
-//   // Add each other as friends
-//   sender.friends.push(receiverId);
-//   receiver.friends.push(senderId);
+  // Add each other as friends
+  sender.friends.push(receiverId);
+  receiver.friends.push(senderId);
 
-//   // Remove from pending lists
-//   receiver.friendRequests = receiver.friendRequests.filter(id => id.toString() !== senderId);
-//   sender.sentRequests = sender.sentRequests.filter(id => id.toString() !== receiverId);
+  // Remove from pending lists
+  sender.sentRequests = sender.sentRequests.filter(
+    (id: string) => id.toString() !== receiverId
+  );
+  receiver.friendRequests = receiver.friendRequests.filter(
+    (id: string) => id.toString() !== senderId
+  );
 
-//   await sender.save();
-//   await receiver.save();
+  await sender.save();
+  await receiver.save();
 
-//   res.json({ message: "Friend request accepted" });
-// };
+  return { message: "Friend request accepted", user: { sender, receiver } };
+};
 
 // // POST /friends/reject
 // export const rejectFriendRequest = async (req, res) => {

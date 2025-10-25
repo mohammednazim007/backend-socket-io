@@ -4,7 +4,6 @@ import {
   login,
   logout,
   getCurrent,
-  getRelatedFriends,
   updateUserProfile,
 } from "./user.controller";
 import { validateRequest } from "../../middlewares/validateRequest";
@@ -20,7 +19,6 @@ router.post("/login", validateRequest(loginSchema), login);
 
 //**  Protected routes (require authentication)
 router.get("/current-user", authMiddleware, getCurrent);
-router.get("/related-friends/:id", authMiddleware, getRelatedFriends);
 router.post(
   "/profile",
   authMiddleware,

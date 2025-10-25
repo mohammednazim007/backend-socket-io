@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import {
   sendRequest,
   cancelRequest,
-  getSentRequests,
+  acceptedFriend,
   getNonFriendUsers,
+  acceptRequest,
 } from "./friend.service";
 
 // ** Get all non-friend users
@@ -29,10 +30,10 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
 };
 
 // ** Get sent friend requests
-export const getSentFriendRequests = async (req: Request, res: Response) => {
+export const getAcceptedFriend = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id as string;
-    const result = await getSentRequests(userId);
+    const result = await acceptedFriend(userId);
     res.status(200).json(result);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
@@ -52,15 +53,15 @@ export const cancelFriendRequest = async (req: Request, res: Response) => {
 };
 
 // ** Accept friend request
-// export const acceptFriendRequest = async (req: Request, res: Response) => {
-//   try {
-//     const { userId, requesterId } = req.body;
-//     const result = await acceptRequest(userId, requesterId);
-//     res.status(200).json(result);
-//   } catch (error: any) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
+export const acceptFriendRequest = async (req: Request, res: Response) => {
+  try {
+    const { senderId, receiverId } = req.body;
+    const result = await acceptRequest(senderId, receiverId);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 // // ** Reject friend request
 // export const rejectFriendRequest = async (req: Request, res: Response) => {

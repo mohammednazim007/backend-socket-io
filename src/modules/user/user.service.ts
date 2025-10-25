@@ -43,28 +43,6 @@ export const loginUser = async (email: string, password: string) => {
   return { token, user: userObj };
 };
 
-// ** Get all Friends
-export const getCurrentRelatedFriends = async (userId: string) => {
-  const friends = await User.aggregate([
-    {
-      $match: {
-        _id: { $ne: new mongoose.Types.ObjectId(userId) },
-        friends: { $in: [userId] },
-      },
-    },
-    {
-      $project: {
-        __v: 0,
-        password: 0,
-      },
-    },
-  ]);
-
-  if (!friends) throw new Error("Friend is not found");
-
-  return friends;
-};
-
 //** profile image upload service
 export const updateProfile = async (
   userId: string,
