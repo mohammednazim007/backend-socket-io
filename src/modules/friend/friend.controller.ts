@@ -55,11 +55,20 @@ export const getAcceptedFriend = async (req: Request, res: Response) => {
 // ** DELETE - Cancel friend request
 export const cancelFriendRequest = async (req: Request, res: Response) => {
   try {
-    const senderId = (req as any).user.id as string;
+    const senderId = req.user?.id as string;
     const { receiverId } = req.params;
+
+    if (!senderId)
+      res.status(401).json({ message: "Authentication required." });
+
+    if (!receiverId)
+      res.status(400).json({ message: "Receiver ID is missing." });
+
     const result = await cancelRequest(senderId, receiverId);
-    res.status(200).json(result);
+    return res.status(200).json(result);
   } catch (error: any) {
+    // Log error for debugging, then send generic 400 response
+    console.error("Cancel Request Error:", error.message);
     res.status(400).json({ message: error.message });
   }
 };

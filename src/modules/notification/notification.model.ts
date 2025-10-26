@@ -3,8 +3,8 @@ import { INotification } from "./notification.interface";
 
 const notificationSchema = new Schema<INotification>(
   {
-    senderId: { type: String, required: true },
-    receiverId: { type: String, required: true },
+    senderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    receiverId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },
     avatar: { type: String, required: false },
     type: {

@@ -1,6 +1,8 @@
+import mongoose from "mongoose";
+
 export interface INotification {
-  senderId: string;
-  receiverId: string;
+  senderId: mongoose.Types.ObjectId;
+  receiverId: mongoose.Types.ObjectId;
   name: string;
   avatar: string;
   type: "friend_request" | "message" | "system";

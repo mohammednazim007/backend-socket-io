@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { getReceiverSocketId, io } from "../../socket/socket-io";
 import Notification from "../notification/notification.model";
 import User from "../user/user.model";
@@ -30,8 +31,8 @@ export const sendRequest = async (senderId: string, receiverId: string) => {
 
   // ✅ 1. Create a persistent notification
   const notification = await Notification.create({
-    senderId,
-    receiverId,
+    senderId: new mongoose.Types.ObjectId(senderId),
+    receiverId: new mongoose.Types.ObjectId(receiverId),
     type: "friend_request",
     name: sender.name,
     message: `${sender.name} sent you a friend request.`,
@@ -113,36 +114,77 @@ export const getNonFriendUsers = async (userId: string) => {
 };
 
 // ** Cancel friend request
+// export const cancelRequest = async (senderId: string, receiverId: string) => {
+//   const sender = User.findById(senderId);
+//   const receiver = User.findById(receiverId);
+
+//   const [senderExists, receiverExists] = await Promise.all([sender, receiver]);
+//   if (!senderExists || !receiverExists) throw new Error("User not found");
+
+//   const [updatedSender, updatedReceiver, deleteResult] = await Promise.all([
+//     User.findByIdAndUpdate(
+//       receiverId,
+//       { $pull: { sentRequests: senderId } },
+//       { new: true } // Return the updated document
+//     ),
+//     User.findByIdAndUpdate(
+//       senderId,
+//       { $pull: { friendRequests: receiverId } },
+//       { new: true } // Return the updated document
+//     ),
+//     Notification.deleteOne({ senderId, receiverId, type: "friend_request" }),
+//   ]);
+
+//   return {
+//     message: "Friend request cancelled successfully",
+//     users: { updatedSender, updatedReceiver },
+//   };
+// };
+
 export const cancelRequest = async (senderId: string, receiverId: string) => {
-  const sender = await User.findById(senderId);
-  const receiver = await User.findById(receiverId);
+  // Ensure both users exist
+  const [sender, receiver] = await Promise.all([
+    User.findById(senderId),
+    User.findById(receiverId),
+  ]);
 
-  if (!sender || !receiver) throw new Error("User not found");
+  if (!sender || !receiver) {
+    throw new Error("User not found");
+  }
 
-  // Remove the receiverId from sender's sentRequests
-  sender.sentRequests = sender.sentRequests.filter(
-    (id: string) => id.toString() !== receiverId
-  );
+  // Update both users
+  const [updatedSender, updatedReceiver] = await Promise.all([
+    User.findByIdAndUpdate(
+      receiverId,
+      { $pull: { sentRequests: senderId } },
+      { new: true } // Return the updated document
+    ),
+    User.findByIdAndUpdate(
+      senderId,
+      { $pull: { friendRequests: receiverId } },
+      { new: true } // Return the updated document
+    ),
+    // Notification.deleteOne({ senderId, receiverId, type: "friend_request" }),
+  ]);
 
-  // Remove the senderId from receiver's friendRequests
-  receiver.friendRequests = receiver.friendRequests.filter(
-    (id: string) => id.toString() !== senderId
-  );
-  console.log(sender.sentRequests, receiver.friendRequests);
-
-  await sender.save();
-  await receiver.save();
-
-  // Delete any related notification
-  await Notification.deleteOne({
-    senderId,
-    receiverId,
+  // Delete corresponding notification
+  await Notification.deleteMany({
+    senderId: new mongoose.Types.ObjectId(receiverId),
+    receiverId: new mongoose.Types.ObjectId(senderId),
     type: "friend_request",
   });
 
+  const test = await Notification.find({
+    senderId: new mongoose.Types.ObjectId(receiverId),
+    receiverId: new mongoose.Types.ObjectId(senderId),
+    type: "friend_request",
+  });
+
+  console.log("test", test);
+
   return {
     message: "Friend request cancelled successfully",
-    user: { receiver },
+    users: { updatedSender, updatedReceiver },
   };
 };
 
