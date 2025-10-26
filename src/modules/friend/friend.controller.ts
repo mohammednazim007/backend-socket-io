@@ -43,9 +43,9 @@ export const getAcceptedFriend = async (req: Request, res: Response) => {
 // ** Cancel friend request
 export const cancelFriendRequest = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id as string;
+    const senderId = (req as any).user.id as string;
     const { receiverId } = req.params;
-    const result = await cancelRequest(userId, receiverId);
+    const result = await cancelRequest(senderId, receiverId);
     res.status(200).json(result);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
