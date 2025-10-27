@@ -3,7 +3,14 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
-// ** Create User with name, email and password
+// ============================================================
+// ✅ METHOD: POST
+// ✅ SERVICE: createUser
+// PURPOSE:
+//    - Create a new user with name, email, password, and optional avatar.
+// CONTROLLER:
+//    - Called by `register` in `user.controller.ts` to register a new user.
+// ============================================================
 export const createUser = async (
   name: string,
   email: string,
@@ -24,7 +31,14 @@ export const createUser = async (
   return user;
 };
 
-// ** Login User with email and password
+// ============================================================
+// ✅ METHOD: POST
+// ✅ SERVICE: loginUser
+// PURPOSE:
+//    - Authenticate user with email and password, and return JWT token.
+// CONTROLLER:
+//    - Called by `login` in `user.controller.ts` to log in a user.
+// ============================================================
 export const loginUser = async (email: string, password: string) => {
   const user = await User.findOne({ email });
   if (!user) throw new Error("User not found with this credentials");
@@ -36,14 +50,24 @@ export const loginUser = async (email: string, password: string) => {
     expiresIn: "1d",
   });
 
-  // Convert Mongoose document to plain object
   const userObj = user.toObject();
-  delete userObj.password; // remove password
+  delete userObj.password;
 
   return { token, user: userObj };
 };
 
-//** profile image upload service
+// ============================================================
+// ✅ METHOD: POST
+// ✅ SERVICE: updateProfile
+// PURPOSE:
+//    - Update user's profile data: name, password, and optional avatar.
+// PARAMS:
+//    - `file`: uploaded profile image (optional)
+//    - `currentPassword`, `newPassword`: for password change (optional)
+//    - `name`: updated name (optional)
+// CONTROLLER:
+//    - Called by `updateUserProfile` in `user.controller.ts`
+// ============================================================
 export const updateProfile = async (
   userId: string,
   file?: Express.Multer.File & { path?: string; filename?: string },
@@ -56,35 +80,30 @@ export const updateProfile = async (
     throw new Error("User not found");
   }
 
-  // Update name
-  if (name) {
-    user.name = name;
-  }
+  if (name) user.name = name;
 
-  // Handle password update if currentPassword + newPassword are provided
   if (currentPassword && newPassword) {
     const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
-      throw new Error("Current password is incorrect");
-    }
+    if (!isMatch) throw new Error("Current password is incorrect");
     user.password = await bcrypt.hash(newPassword, 10);
   }
 
-  // Handle avatar upload
-  if (file?.path) {
-    user.avatar = file.path; // could be Cloudinary URL if uploaded before
-  }
+  if (file?.path) user.avatar = file.path;
 
   await user.save();
-
   return user;
 };
 
-// ** get the current user by id
+// ============================================================
+// ✅ METHOD: GET
+// ✅ SERVICE: getCurrentUser
+// PURPOSE:
+//    - Fetch the current user by ID, excluding password.
+// CONTROLLER:
+//    - Called by `getCurrent` in `user.controller.ts`
+// ============================================================
 export const getCurrentUser = async (userId: string) => {
   const user = await User.findById(userId).select("-password");
-
   if (!user) throw new Error("User not found");
-
   return user;
 };

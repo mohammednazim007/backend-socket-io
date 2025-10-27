@@ -13,18 +13,26 @@ import { upload } from "../../cloudinary/upload";
 
 const router: Router = express.Router();
 
-//**  Public routes
+//** Public routes
+// Register a new user
 router.post("/register", validateRequest(registerSchema), register);
+
+// Login user and return token
 router.post("/login", validateRequest(loginSchema), login);
 
-//**  Protected routes (require authentication)
+//** Protected routes (require authentication)
+// Get currently logged-in user
 router.get("/current-user", authMiddleware, getCurrent);
+
+// Update user profile with optional image
 router.post(
   "/profile",
   authMiddleware,
   upload.single("image"),
   updateUserProfile
 );
+
+// Logout user
 router.get("/logout", logout);
 
 export default router;

@@ -7,7 +7,13 @@ import {
 } from "./user.service";
 import { getCookieOptions } from "../../utils/get-cookie-options";
 
-// ** Register User with name, email and password
+// ============================================================
+// ✅ ROUTE: POST /users/register
+// PURPOSE:
+//    - Register a new user with name, email, password, and optional avatar.
+// CONTROLLER:
+//    - `register` calls `createUser` service and returns created user.
+// ============================================================
 export const register = async (
   req: Request,
   res: Response,
@@ -16,14 +22,19 @@ export const register = async (
   try {
     const { name, email, password, avatar } = req.body;
     const user = await createUser(name, email, password, avatar);
-
     res.status(201).json(user);
   } catch (error) {
     next(error);
   }
 };
 
-// ** Login User with email and password
+// ============================================================
+// ✅ ROUTE: POST /users/login
+// PURPOSE:
+//    - Login user with email and password, set auth token in cookie.
+// CONTROLLER:
+//    - `login` calls `loginUser` service and returns user data (token in cookie).
+// ============================================================
 export const login = async (
   req: Request,
   res: Response,
@@ -33,10 +44,7 @@ export const login = async (
     const { email, password } = req.body;
     const result = await loginUser(email, password);
 
-    // Set secure HTTP-only cookie with JWT token
     res.cookie("authToken", result.token, getCookieOptions());
-
-    // Return user data without token (token is now in cookie)
     res.status(200).json({
       message: "Login successful",
       user: result.user,
@@ -46,28 +54,38 @@ export const login = async (
   }
 };
 
-// ** Logout User
+// ============================================================
+// ✅ ROUTE: GET /users/logout
+// PURPOSE:
+//    - Logout user by clearing the authentication cookie.
+// CONTROLLER:
+//    - `logout` clears the authToken cookie and returns a success message.
+// ============================================================
 export const logout = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    // Clear the auth cookie
     res.clearCookie("authToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
     });
-
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     next(error);
   }
 };
 
-// ** Get Current User
+// ============================================================
+// ✅ ROUTE: GET /users/current-user
+// PURPOSE:
+//    - Get the currently logged-in user's information.
+// CONTROLLER:
+//    - `getCurrent` calls `getCurrentUser` service and returns user data.
+// ============================================================
 export const getCurrent = async (
   req: Request,
   res: Response,
@@ -75,7 +93,6 @@ export const getCurrent = async (
 ) => {
   try {
     const user = await getCurrentUser(req.user?.id as string);
-
     res
       .status(200)
       .json({ message: "Current user fetched successfully", user });
@@ -84,14 +101,23 @@ export const getCurrent = async (
   }
 };
 
-// ** profile image upload
+// ============================================================
+// ✅ ROUTE: POST /users/profile
+// PURPOSE:
+//    - Update logged-in user's profile, including optional profile image and password.
+// PARAMS:
+//    - `name`, `currentPassword`, `newPassword` from request body.
+//    - `file` from uploaded image (optional).
+// CONTROLLER:
+//    - `updateUserProfile` calls `updateProfile` service and returns updated user.
+// ============================================================
 export const updateUserProfile = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const userId = (req as any).user?.id; // assume JWT middleware sets req.user
+    const userId = (req as any).user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
