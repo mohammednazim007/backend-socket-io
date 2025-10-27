@@ -1,3 +1,4 @@
+//** export default router;
 import express, { Router } from "express";
 import {
   sendFriendRequest,
@@ -8,13 +9,25 @@ import {
   getAllRequestedFriend,
 } from "./friend.controller";
 import { authMiddleware } from "../../middlewares/auth.middleware";
+
 const router: Router = express.Router();
 
-router.get("/non-friends", authMiddleware, getAllNonFriendUsers); //1
-router.get("/get-requested-friends", authMiddleware, getAllRequestedFriend); //5
-router.put("/send-request", authMiddleware, sendFriendRequest); //2
-router.get("/accepted-friends", authMiddleware, getAcceptedFriend); //3
-router.put("/accept-request", authMiddleware, acceptFriendRequest); //4
+//** Get all users who are not friends or requested
+router.get("/non-friends", authMiddleware, getAllNonFriendUsers);
+
+//** Get all incoming friend requests
+router.get("/get-requested-friends", authMiddleware, getAllRequestedFriend);
+
+//** Send a friend request to another user
+router.put("/send-request", authMiddleware, sendFriendRequest);
+
+//** Get all accepted friends of logged-in user
+router.get("/accepted-friends", authMiddleware, getAcceptedFriend);
+
+//** Accept a friend request
+router.put("/accept-request", authMiddleware, acceptFriendRequest);
+
+//** Cancel a sent friend request
 router.delete(
   "/cancel-request/:receiverId",
   authMiddleware,

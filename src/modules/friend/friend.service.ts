@@ -1,202 +1,10 @@
-// import mongoose from "mongoose";
-// import { getReceiverSocketId, io } from "../../socket/socket-io";
-// import Notification from "../notification/notification.model";
-// import User from "../user/user.model";
-
-// // ** Send friend request
-// export const sendRequest = async (senderId: string, receiverId: string) => {
-//   if (senderId === receiverId) {
-//     throw new Error("Cannot send a friend request to yourself");
-//   }
-
-//   // Fetch both users in parallel
-//   const [sender, receiver] = await Promise.all([
-//     User.findById(senderId),
-//     User.findById(receiverId),
-//   ]);
-
-//   if (!sender || !receiver) {
-//     throw new Error("User not found");
-//   }
-
-//   // Prevent duplicate or invalid requests
-//   if (
-//     sender.friends.includes(receiverId) ||
-//     sender.sentRequests.includes(receiverId) ||
-//     sender.friendRequests.includes(receiverId) ||
-//     receiver.friends.includes(senderId) ||
-//     receiver.friendRequests.includes(senderId)
-//   ) {
-//     throw new Error("Friend request already exists");
-//   }
-
-//   // ✅ Update both users atomically using $push (faster than .save())
-//   const [updatedSender, updatedReceiver] = await Promise.all([
-//     User.findByIdAndUpdate(
-//       senderId,
-//       { $push: { sentRequests: receiverId } },
-//       { new: true }
-//     ),
-//     User.findByIdAndUpdate(
-//       receiverId,
-//       { $push: { friendRequests: senderId } },
-//       { new: true }
-//     ),
-//   ]);
-
-//   // ✅ Create persistent notification
-//   const notification = await Notification.create({
-//     senderId: new mongoose.Types.ObjectId(senderId),
-//     receiverId: new mongoose.Types.ObjectId(receiverId),
-//     type: "friend_request",
-//     name: sender.name,
-//     message: `${sender.name} sent you a friend request.`,
-//     avatar: sender.avatar,
-//   });
-
-//   // ✅ Emit real-time event if receiver is online
-//   const receiverSocketId = getReceiverSocketId(receiverId);
-//   if (receiverSocketId) {
-//     io.to(receiverSocketId).emit("friend_request_received", {
-//       senderId,
-//       senderName: sender.name,
-//       message: notification.message,
-//       notificationId: notification._id,
-//       createdAt: notification.createdAt,
-//     });
-//   }
-
-//   return {
-//     message: "Friend request sent successfully",
-//     data: { sender: updatedSender, receiver: updatedReceiver },
-//   };
-// };
-
-// // ** Get accepted friend requests
-// export const acceptedFriend = async (userId: string) => {
-//   const userExists = await User.exists({ _id: userId });
-//   if (!userExists) throw new Error("User not found");
-
-//   const populatedUser = await User.findById(userId).populate({
-//     path: "friends",
-//     select: "-password",
-//   });
-
-//   return {
-//     message: "Sent friend requests retrieved successfully",
-//     users: populatedUser?.friends || [],
-//   };
-// };
-
-// // ** Get all requested friend
-// export const getRequestedFriend = async (userId: string) => {
-//   const userExists = await User.exists({ _id: userId });
-//   if (!userExists) throw new Error("User not found");
-
-//   const populatedUser = await User.findById(userId).populate({
-//     path: "friendRequests",
-//     select: "-password",
-//   });
-
-//   return {
-//     message: "Sent friend requests retrieved successfully",
-//     users: populatedUser?.friendRequests || [],
-//   };
-// };
-
-// // ** Get all non-friend users
-// export const getNonFriendUsers = async (userId: string) => {
-//   const user = await User.findById(userId);
-//   if (!user) throw new Error("User not found");
-
-//   const nonFriendUsers = await User.find({
-//     $and: [
-//       { _id: { $ne: userId } },
-//       { _id: { $nin: user.friends } },
-//       // { _id: { $nin: user.friendRequests } },
-//       { _id: { $nin: user.sentRequests } },
-//     ],
-//   }).select("-password");
-
-//   return {
-//     message: "Non-friend users retrieved successfully",
-//     users: nonFriendUsers,
-//   };
-// };
-
-// // ** Cancel friend request
-// export const cancelRequest = async (senderId: string, receiverId: string) => {
-//   if (senderId === receiverId) {
-//     throw new Error("Cannot cancel a request to yourself");
-//   }
-
-//   // Fetch both users in parallel
-//   const [sender, receiver] = await Promise.all([
-//     User.findById(senderId),
-//     User.findById(receiverId),
-//   ]);
-
-//   if (!sender || !receiver) throw new Error("User not found");
-
-//   // ✅ Remove pending request
-//   const [updatedSender, updatedReceiver] = await Promise.all([
-//     User.findByIdAndUpdate(
-//       senderId,
-//       { $pull: { friendRequests: receiverId } },
-//       { new: true }
-//     ),
-//     User.findByIdAndUpdate(
-//       receiverId,
-//       { $pull: { sentRequests: senderId } },
-//       { new: true }
-//     ),
-//   ]);
-
-//   // ✅ Delete any corresponding notification
-//   await Notification.deleteMany({
-//     senderId: new mongoose.Types.ObjectId(senderId),
-//     receiverId: new mongoose.Types.ObjectId(receiverId),
-//     type: "friend_request",
-//   });
-
-//   return {
-//     message: "Friend request cancelled successfully",
-//     data: { sender: updatedSender, receiver: updatedReceiver },
-//   };
-// };
-
-// //** POST /friends/accept
-// export const acceptRequest = async (senderId: string, receiverId: string) => {
-//   const sender = await User.findById(senderId);
-//   const receiver = await User.findById(receiverId);
-
-//   if (!sender || !receiver) throw new Error("User not found");
-
-//   // Add each other as friends
-//   sender.friends.push(receiverId);
-//   receiver.friends.push(senderId);
-
-//   // Remove from pending lists
-//   sender.sentRequests = sender.sentRequests.filter(
-//     (id: string) => id.toString() !== receiverId
-//   );
-//   receiver.friendRequests = receiver.friendRequests.filter(
-//     (id: string) => id.toString() !== senderId
-//   );
-
-//   await sender.save();
-//   await receiver.save();
-
-//   return { message: "Friend request accepted", user: { sender, receiver } };
-// };
-
 import mongoose from "mongoose";
 import { getReceiverSocketId, io } from "../../socket/socket-io";
 import Notification from "../notification/notification.model";
 import User from "../user/user.model";
 
 // ============================================================
-// ✅ FUNCTION: sendRequest
+// ✅ FUNCTION: POST- sendRequest
 // PURPOSE: Handles sending a friend request between two users.
 // LOGIC:
 // - Prevents sending a request to yourself.
@@ -275,7 +83,7 @@ export const sendRequest = async (senderId: string, receiverId: string) => {
 };
 
 // ============================================================
-// ✅ FUNCTION: acceptedFriend
+// ✅ FUNCTION: GET- acceptedFriend
 // PURPOSE: Fetch all accepted (confirmed) friends of a user.
 // LOGIC:
 // - Checks if the user exists.
@@ -298,7 +106,7 @@ export const acceptedFriend = async (userId: string) => {
 };
 
 // ============================================================
-// ✅ FUNCTION: getRequestedFriend
+// ✅ FUNCTION: GET- getRequestedFriend
 // PURPOSE: Retrieve all pending friend requests for a user.
 // LOGIC:
 // - Verifies user existence.
@@ -321,7 +129,7 @@ export const getRequestedFriend = async (userId: string) => {
 };
 
 // ============================================================
-// ✅ FUNCTION: getNonFriendUsers
+// ✅ FUNCTION: GET- getNonFriendUsers
 // PURPOSE: Get all users who are not friends, not requested, and not self.
 // LOGIC:
 // - Finds users who are not in the current user's friends or sentRequests list.
@@ -348,7 +156,7 @@ export const getNonFriendUsers = async (userId: string) => {
 };
 
 // ============================================================
-// ✅ FUNCTION: cancelRequest
+// ✅ FUNCTION: DELETE- cancelRequest
 // PURPOSE: Cancel a sent friend request.
 // LOGIC:
 // - Prevents canceling request to yourself.
@@ -397,7 +205,7 @@ export const cancelRequest = async (senderId: string, receiverId: string) => {
 };
 
 // ============================================================
-// ✅ FUNCTION: acceptRequest
+// ✅ FUNCTION: PUT- acceptRequest
 // PURPOSE: Accept a received friend request.
 // LOGIC:
 // - Fetches both users (sender and receiver).
