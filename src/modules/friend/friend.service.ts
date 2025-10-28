@@ -165,9 +165,8 @@ export const getNonFriendUsers = async (userId: string) => {
 // - Deletes corresponding notifications from the database.
 // ============================================================
 export const cancelRequest = async (senderId: string, receiverId: string) => {
-  if (senderId === receiverId) {
+  if (senderId === receiverId)
     throw new Error("Cannot cancel a request to yourself");
-  }
 
   // Fetch both users in parallel
   const [sender, receiver] = await Promise.all([
@@ -175,7 +174,7 @@ export const cancelRequest = async (senderId: string, receiverId: string) => {
     User.findById(receiverId),
   ]);
 
-  if (!sender || !receiver) throw new Error("User not found");
+  if (!sender || !receiver) throw new Error("User not found in database");
 
   // ✅ Remove pending request
   const [updatedSender, updatedReceiver] = await Promise.all([
