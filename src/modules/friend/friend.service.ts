@@ -4,7 +4,7 @@ import Notification from "../notification/notification.model";
 import User from "../user/user.model";
 
 // ============================================================
-// ✅ FUNCTION: POST- sendRequest
+// ✅ Method: POST- sendRequest
 // PURPOSE: Handles sending a friend request between two users.
 // LOGIC:
 // - Prevents sending a request to yourself.
@@ -83,7 +83,7 @@ export const sendRequest = async (senderId: string, receiverId: string) => {
 };
 
 // ============================================================
-// ✅ FUNCTION: GET- acceptedFriend
+// ✅ Method: GET- acceptedFriend
 // PURPOSE: Fetch all accepted (confirmed) friends of a user.
 // LOGIC:
 // - Checks if the user exists.
@@ -106,7 +106,7 @@ export const acceptedFriend = async (userId: string) => {
 };
 
 // ============================================================
-// ✅ FUNCTION: GET- getRequestedFriend
+// ✅ Method: GET- getRequestedFriend
 // PURPOSE: Retrieve all pending friend requests for a user.
 // LOGIC:
 // - Verifies user existence.
@@ -129,7 +129,7 @@ export const getRequestedFriend = async (userId: string) => {
 };
 
 // ============================================================
-// ✅ FUNCTION: GET- getNonFriendUsers
+// ✅ Method: GET- getNonFriendUsers
 // PURPOSE: Get all users who are not friends, not requested, and not self.
 // LOGIC:
 // - Finds users who are not in the current user's friends or sentRequests list.
@@ -156,7 +156,7 @@ export const getNonFriendUsers = async (userId: string) => {
 };
 
 // ============================================================
-// ✅ FUNCTION: DELETE- cancelRequest
+// ✅ Method: DELETE- cancelRequest
 // PURPOSE: Cancel a sent friend request.
 // LOGIC:
 // - Prevents canceling request to yourself.
@@ -205,7 +205,7 @@ export const cancelRequest = async (senderId: string, receiverId: string) => {
 };
 
 // ============================================================
-// ✅ FUNCTION: PUT- acceptRequest
+// ✅ Method: PUT- acceptRequest
 // PURPOSE: Accept a received friend request.
 // LOGIC:
 // - Fetches both users (sender and receiver).
