@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-//** Define the email regex as a constant for reusability
+// Email and password regex constants
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
 
@@ -20,5 +20,6 @@ export const loginSchema = z.object({
   }),
 });
 
+// Reuse the same names
 export type RegisterSchema = z.infer<typeof registerSchema>;
 export type LoginSchema = z.infer<typeof loginSchema>;

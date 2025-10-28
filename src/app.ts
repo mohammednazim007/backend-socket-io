@@ -8,6 +8,7 @@ import userRoutes from "./modules/user/user.routes";
 import { errorHandler } from "./middlewares/error.middleware";
 import { healthRoute } from "./middlewares/healthMiddleware";
 import messageRoutes from "./modules/message/message.routes";
+import friendRoutes from "./modules/friend/friend.routes";
 
 const app: Application = express();
 
@@ -33,6 +34,7 @@ app.get("/health", healthRoute);
 // Routes
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/message", messageRoutes);
+app.use("/api/v1/friend", friendRoutes);
 
 // Global Health & Error Handler
 app.use(errorHandler);
