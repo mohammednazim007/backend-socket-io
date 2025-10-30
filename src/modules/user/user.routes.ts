@@ -21,7 +21,7 @@ router.post("/register", validateRequest(registerSchema), register);
 // Login user and return token
 router.post("/login", validateRequest(loginSchema), login);
 
-router.get("/refresh-token", refreshToken);
+router.post("/refresh-token", refreshToken);
 
 //** Protected routes (require authentication)
 // Get currently logged-in user

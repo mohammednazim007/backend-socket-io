@@ -1,36 +1,83 @@
-// src/middlewares/auth.middleware.ts
 import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
-//** Auth Middleware for protecting routes
-
+/**
+ * Auth Middleware: Verifies accessToken and refreshToken
+ */
 export const authMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // Try to get token from cookie first, then from Authorization header
-  let token = req.signedCookies?.authToken || req.cookies?.authToken;
-
-  // Fallback to Authorization header if no cookie
-  if (!token) {
-    token = req.headers.authorization?.split(" ")[1];
-  }
-
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized user" });
-  }
-
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    ) as Express.Request["user"]; // ✅ cast to our custom type
-    // console.log("decoded", decoded);
+    let accessToken =
+      req.signedCookies?.accessToken ||
+      req.cookies?.accessToken ||
+      req.headers.authorization?.split(" ")[1];
 
-    req.user = decoded; // ✅ no more TypeScript error
-    next();
+    let refreshToken =
+      req.signedCookies?.refreshToken ||
+      req.cookies?.refreshToken ||
+      req.headers["x-refresh-token"];
+
+    if (!accessToken && !refreshToken) {
+      return res.status(401).json({ message: "Unauthorized user" });
+    }
+
+    // Verify access token
+    try {
+      const decoded = jwt.verify(
+        accessToken!,
+        process.env.JWT_ACCESS_SECRET as string
+      ) as { id: string; iat?: number; exp?: number };
+
+      req.user = decoded;
+      return next();
+    } catch (accessErr: any) {
+      if (accessErr.name !== "TokenExpiredError") {
+        return res
+          .status(403)
+          .json({ message: "Forbidden - Invalid access token" });
+      }
+    }
+
+    // Access token expired, try refresh token
+    if (!refreshToken) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized - No refresh token" });
+    }
+
+    try {
+      const decodedRefresh = jwt.verify(
+        refreshToken!,
+        process.env.JWT_REFRESH_SECRET as string
+      ) as { id: string; iat?: number; exp?: number };
+
+      // Optionally issue a new access token
+      const newAccessToken = jwt.sign(
+        { id: decodedRefresh.id },
+        process.env.ACCESS_TOKEN_SECRET as string,
+        { expiresIn: "15m" }
+      );
+
+      res.cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        signed: true,
+        maxAge: 15 * 60 * 1000, // 15 minutes
+      });
+
+      req.user = decodedRefresh;
+      return next();
+    } catch (refreshErr) {
+      return res
+        .status(403)
+        .json({ message: "Forbidden - Invalid refresh token" });
+    }
   } catch (err) {
-    return res.status(403).json({ message: "Forbidden" });
+    console.error("Auth Middleware Error:", err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
