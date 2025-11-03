@@ -6,6 +6,8 @@ import {
   updateProfile,
 } from "@/modules/user/user.service";
 import { getCookieOptions } from "@/utils/get-cookie-options";
+import { ZodError } from "zod";
+import { handleZodError } from "@/utils/handleZodError";
 
 // ============================================================
 // ✅ ROUTE: POST /users/register
@@ -24,6 +26,9 @@ export const register = async (
     const user = await createUser(name, email, password, avatar);
     res.status(201).json(user);
   } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json(handleZodError(error));
+    }
     next(error);
   }
 };
@@ -59,6 +64,9 @@ export const login = async (
       user: result.user,
     });
   } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json(handleZodError(error));
+    }
     next(error);
   }
 };
@@ -89,6 +97,9 @@ export const logout = async (
 
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json(handleZodError(error));
+    }
     next(error);
   }
 };
@@ -111,6 +122,9 @@ export const getCurrent = async (
       .status(200)
       .json({ message: "Current user fetched successfully", user });
   } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json(handleZodError(error));
+    }
     next(error);
   }
 };

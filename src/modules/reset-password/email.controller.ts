@@ -3,7 +3,14 @@ import {
   handleSendOtp,
   handleVerifyOtp,
   handleResetPassword,
-} from "./email.service";
+} from "@/modules/reset-password/email.service";
+import {
+  resetPasswordValidation,
+  sendEmailValidation,
+  verifyOtpValidation,
+} from "@/modules/reset-password/email.validation";
+import { ZodError } from "zod";
+import { handleZodError } from "@/utils/handleZodError";
 
 /// ============================================================
 // ✅ ROUTE: POST /auth/send-otp
@@ -17,11 +24,14 @@ export const sendOTP = async (
   next: NextFunction
 ) => {
   try {
-    const { email } = req.body;
+    const { email } = sendEmailValidation.parse(req.body);
     const result = await handleSendOtp(email);
 
     res.status(200).json({ message: "OTP sent successfully", result });
   } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json(handleZodError(error));
+    }
     next(error);
   }
 };
@@ -37,11 +47,15 @@ export const verifyOTPAndResetPassword = async (
   next: NextFunction
 ) => {
   try {
-    const { email, otpCode } = req.body;
+    // const { email, otpCode } = req.body;
+    const { email, otpCode } = verifyOtpValidation.parse(req.body);
     const result = await handleVerifyOtp(email, otpCode);
 
     res.status(200).json({ message: "OTP verified successfully", result });
   } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json(handleZodError(error));
+    }
     next(error);
   }
 };
@@ -57,11 +71,14 @@ export const resetPassword = async (
   next: NextFunction
 ) => {
   try {
-    const { email, newPassword } = req.body;
+    const { email, newPassword } = resetPasswordValidation.parse(req.body);
     const result = await handleResetPassword(email, newPassword);
 
     res.status(200).json({ message: "Password reset successfully", result });
   } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json(handleZodError(error));
+    }
     next(error);
   }
 };
