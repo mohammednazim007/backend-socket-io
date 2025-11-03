@@ -19,3 +19,7 @@ export const resetPasswordValidation = z.object({
   email: z.string().email("Invalid email address"),
   newPassword: z.string().min(6, "Password must be at least 6 characters long"),
 });
+
+export type SendEmailInput = z.infer<typeof sendEmailValidation>;
+export type VerifyOtpInput = z.infer<typeof verifyOtpValidation>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordValidation>;

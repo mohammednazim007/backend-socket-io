@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import { emailOtpTemplate } from "@/email-html-templete/emailTemplete";
 dotenv.config();
 
 export const sendEmail = async (email: string, otp: string) => {
@@ -19,7 +20,7 @@ export const sendEmail = async (email: string, otp: string) => {
     to: [email],
     subject: `Hello, Your OTP Code`,
     text: `Your OTP will be expire in 5 minutes.`,
-    html: `<p>Your OTP code is: <b>${otp}</b></p>`,
+    html: emailOtpTemplate(otp),
   };
 
   await transporter.sendMail(mailOptions);
