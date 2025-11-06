@@ -57,6 +57,10 @@ export const loginUser = async (email: string, password: string) => {
     { expiresIn: "30d" }
   );
 
+  //✅ Update user last active timestamp
+  user.lastActive = new Date();
+  await user.save();
+
   const userObj = user.toObject();
   delete userObj.password;
 

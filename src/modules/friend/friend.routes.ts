@@ -7,8 +7,9 @@ import {
   cancelFriendRequest,
   acceptFriendRequest,
   getAllRequestedFriend,
-} from "./friend.controller";
-import { authMiddleware } from "../../middlewares/auth.middleware";
+  cancelFriendRequestByMe,
+} from "@/modules/friend/friend.controller";
+import { authMiddleware } from "@/middlewares/auth.middleware";
 
 const router: Router = express.Router();
 
@@ -32,6 +33,12 @@ router.delete(
   "/cancel-request/:receiverId",
   authMiddleware,
   cancelFriendRequest
+);
+
+router.delete(
+  "/cancel-request-by-me/:friendId",
+  authMiddleware,
+  cancelFriendRequestByMe
 );
 
 export default router;

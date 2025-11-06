@@ -24,7 +24,7 @@ export const authMiddleware = (
       return res.status(401).json({ message: "Unauthorized user" });
     }
 
-    // Verify access token
+    //✅ Verify access token
     try {
       const decoded = jwt.verify(
         accessToken!,

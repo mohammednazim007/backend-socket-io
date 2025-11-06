@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getReceiverSocketId, io } from "../../socket/socket-io";
-import cloudinary from "../../cloudinary/cloudinary";
-import { createMessage, getMessages } from "./message.service";
+import { getReceiverSocketId, io } from "@/socket/socket-io";
+import cloudinary from "@/cloudinary/cloudinary";
+import { createMessage, getMessages } from "@/modules/message/message.service";
 import mongoose from "mongoose";
 
 // ✅ Send message

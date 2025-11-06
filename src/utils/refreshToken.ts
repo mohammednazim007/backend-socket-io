@@ -1,8 +1,8 @@
 // src/modules/user/auth.controller.ts
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import User from "../modules/user/user.model";
-import { getCookieOptions } from "./get-cookie-options";
+import User from "@/modules/user/user.model";
+import { getCookieOptions } from "@/utils/get-cookie-options";
 
 // 🔄 Refresh token route
 export const refreshToken = async (

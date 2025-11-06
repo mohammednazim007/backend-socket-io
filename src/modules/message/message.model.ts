@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
-import { IMessage } from "./message.interface";
+import { IMessage } from "@/modules/message/message.interface";
+// import { IMessage } from "./message.interface";
 
 const messageSchema = new Schema<IMessage>(
   {

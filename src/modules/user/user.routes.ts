@@ -5,12 +5,12 @@ import {
   logout,
   getCurrent,
   updateUserProfile,
-} from "./user.controller";
-import { validateRequest } from "../../middlewares/validateRequest";
-import { authMiddleware } from "../../middlewares/auth.middleware";
-import { loginSchema, registerSchema } from "./user.validation";
-import { upload } from "../../cloudinary/upload";
-import { refreshToken } from "../../utils/refreshToken";
+} from "@/modules/user/user.controller";
+import { validateRequest } from "@/middlewares/validateRequest";
+import { authMiddleware } from "@/middlewares/auth.middleware";
+import { loginSchema, registerSchema } from "@/modules/user/user.validation";
+import { upload } from "@/cloudinary/upload";
+import { refreshToken } from "@/utils/refreshToken";
 
 const router: Router = express.Router();
 

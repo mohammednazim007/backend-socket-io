@@ -6,6 +6,12 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
+    /* Absolute import setup */
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    },
+
     /* Strict Type-Checking Options */
     "strict": true,
     "esModuleInterop": true,
@@ -18,7 +24,7 @@
 
     /* Node environment */
     "lib": ["ES2020"],
-    "types": ["node", "express"]
+    "types": ["node"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
