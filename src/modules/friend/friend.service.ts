@@ -45,12 +45,12 @@ export const sendRequest = async (senderId: string, receiverId: string) => {
     User.findByIdAndUpdate(
       senderId,
       { $push: { sentRequests: receiverId } },
-      { new: true },
+      { new: true }
     ),
     User.findByIdAndUpdate(
       receiverId,
       { $push: { friendRequests: senderId } },
-      { new: true },
+      { new: true }
     ),
   ]);
 
@@ -181,12 +181,12 @@ export const cancelRequest = async (senderId: string, receiverId: string) => {
     User.findByIdAndUpdate(
       senderId,
       { $pull: { friendRequests: receiverId } },
-      { new: true },
+      { new: true }
     ),
     User.findByIdAndUpdate(
       receiverId,
       { $pull: { sentRequests: senderId } },
-      { new: true },
+      { new: true }
     ),
   ]);
 
@@ -203,6 +203,53 @@ export const cancelRequest = async (senderId: string, receiverId: string) => {
   };
 };
 
+// ============================================================
+// ✅ Method: DELETE- cancelRequestByMe
+// PURPOSE: Cancel a friend request sent by the user.
+// LOGIC:
+// - Prevents canceling request to yourself.
+// - Fetches both users.
+// - Removes the pending request from both sender and receiver.
+// - Deletes corresponding notifications from the database.
+// ============================================================
+export const cancelRequestByMe = async (userId: string, friendId: string) => {
+  if (userId === friendId)
+    throw new Error("Cannot cancel a request to yourself");
+
+  // Fetch both users in parallel
+  const [currentUser, friend] = await Promise.all([
+    User.findById(userId),
+    User.findById(friendId),
+  ]);
+
+  if (!currentUser || !friend) throw new Error("User not found in database");
+
+  // ✅ Remove pending request
+  const [updatedSender, updatedReceiver] = await Promise.all([
+    User.findByIdAndUpdate(
+      userId,
+      { $pull: { sentRequests: friendId } },
+      { new: true }
+    ),
+    User.findByIdAndUpdate(
+      friendId,
+      { $pull: { friendRequests: userId } },
+      { new: true }
+    ),
+  ]);
+
+  // ✅ Delete any corresponding notification
+  await Notification.deleteOne({
+    senderId: new mongoose.Types.ObjectId(userId),
+    receiverId: new mongoose.Types.ObjectId(friendId),
+    type: "friend_request",
+  });
+
+  return {
+    message: "Friend request cancelled successfully",
+    data: { sender: updatedSender, receiver: updatedReceiver },
+  };
+};
 // ============================================================
 // ✅ Method: PUT- acceptRequest
 // PURPOSE: Accept a received friend request.
@@ -224,10 +271,10 @@ export const acceptRequest = async (senderId: string, receiverId: string) => {
 
   // Remove from pending lists
   sender.sentRequests = sender.sentRequests.filter(
-    (id: string) => id.toString() !== receiverId,
+    (id: string) => id.toString() !== receiverId
   );
   receiver.friendRequests = receiver.friendRequests.filter(
-    (id: string) => id.toString() !== senderId,
+    (id: string) => id.toString() !== senderId
   );
 
   await sender.save();

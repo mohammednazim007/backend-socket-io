@@ -1,12 +1,4 @@
 import { Request, Response } from "express";
-// import {
-//   sendRequest,
-//   cancelRequest,
-//   acceptedFriend,
-//   getNonFriendUsers,
-//   acceptRequest,
-//   getRequestedFriend,
-// } from "./friend.service";
 import {
   sendRequest,
   cancelRequest,
@@ -14,6 +6,7 @@ import {
   getNonFriendUsers,
   acceptRequest,
   getRequestedFriend,
+  cancelRequestByMe,
 } from "@/modules/friend/friend.service";
 import { login } from "../user/user.controller";
 
@@ -123,6 +116,20 @@ export const cancelFriendRequest = async (req: Request, res: Response) => {
     return res.status(200).json(result);
   } catch (error: any) {
     // Log error for debugging, then send generic 400 response
+    console.error("Cancel Request Error:", error.message);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// cancel friend request by me
+export const cancelFriendRequestByMe = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id as string;
+    const { friendId } = req.params;
+
+    const result = await cancelRequestByMe(userId, friendId);
+    return res.status(200).json(result);
+  } catch (error: any) {
     console.error("Cancel Request Error:", error.message);
     res.status(400).json({ message: error.message });
   }

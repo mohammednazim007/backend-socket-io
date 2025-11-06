@@ -7,6 +7,7 @@ import {
   cancelFriendRequest,
   acceptFriendRequest,
   getAllRequestedFriend,
+  cancelFriendRequestByMe,
 } from "@/modules/friend/friend.controller";
 import { authMiddleware } from "@/middlewares/auth.middleware";
 
@@ -32,6 +33,12 @@ router.delete(
   "/cancel-request/:receiverId",
   authMiddleware,
   cancelFriendRequest
+);
+
+router.delete(
+  "/cancel-request-by-me/:friendId",
+  authMiddleware,
+  cancelFriendRequestByMe
 );
 
 export default router;
