@@ -1,16 +1,21 @@
 import { IMessage } from "@/modules/message/message.interface";
 import Message from "@/modules/message/message.model";
 
-// ** Create the message
+// ============================================================
+// ✅ Create a new message
+//    - Saves a message (text/media) to MongoDB.
+// ============================================================
 export const createMessage = async (
   data: Partial<IMessage>
 ): Promise<IMessage> => {
   const message = await Message.create(data);
-
   return message;
 };
 
-// ** GET the message
+// ============================================================
+// ✅ Get chat messages
+//    - Fetches all messages between two users (sender & receiver).
+// ============================================================
 export const getMessages = async (
   userId: string,
   friend_id: string
