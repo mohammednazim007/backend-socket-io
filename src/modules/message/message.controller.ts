@@ -4,47 +4,60 @@ import cloudinary from "@/cloudinary/cloudinary";
 import { createMessage, getMessages } from "@/modules/message/message.service";
 import mongoose from "mongoose";
 
-// ✅ Send message
+// ============================================================
+// ✅ ROUTE: POST /messages/:friend_id
+// PURPOSE:
+//    - Send a text or image message from the authenticated user
+//      to a specified friend (receiver).
+// DESCRIPTION:
+//    - Handles both plain text and optional media (image upload).
+//    - Saves the message to MongoDB.
+//    - Emits the new message to the receiver in real-time if they are online.
+// ============================================================
 export const sendMessage = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { sender_id, text } = req.body;
-    const { receiver_id } = req.params; // comes from URL
+    const { text } = req.body;
+    const userId = req.user?.id as string;
+    const { friend_id } = req.params;
 
-    // Type guard
-    if (!sender_id || !receiver_id) {
-      return res
-        .status(400)
-        .json({ message: "sender_id and receiver_id are required" });
+    // ** Validation
+    if (!userId || !friend_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Both sender_id and receiver_id are required.",
+      });
     }
 
     let mediaPath: string | undefined;
 
-    // ✅ Handle image upload if present
+    //** Upload media to Cloudinary (if file present)
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path);
       mediaPath = result.secure_url;
     }
 
-    // ✅ Create message in MongoDB
+    // ** Create and save message in MongoDB
     const newMessage = await createMessage({
       text,
       media: mediaPath,
-      sender_id: new mongoose.Types.ObjectId(sender_id),
-      receiver_id: new mongoose.Types.ObjectId(receiver_id),
+      user_id: new mongoose.Types.ObjectId(userId),
+      friend_id: new mongoose.Types.ObjectId(friend_id),
     });
 
-    // ✅ Emit message to receiver if online
-    const receiverSocketId = getReceiverSocketId(receiver_id);
+    // ** Emit message to receiver (if online)
+    const receiverSocketId = getReceiverSocketId(friend_id);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("new_message", newMessage);
     }
 
+    // ✅ Success response
     return res.status(201).json({
-      message: "Message sent successfully",
+      success: true,
+      message: "Message sent successfully.",
       data: newMessage,
     });
   } catch (error) {
@@ -52,28 +65,33 @@ export const sendMessage = async (
   }
 };
 
+// ============================================================
+// ✅ ROUTE: GET /messages/:friend_id
+// PURPOSE:
+//    - Fetch the chat history between the authenticated user
+//      and the specified friend.
+// DESCRIPTION:
+//    - Retrieves all messages (both sent and received)
+//      between the two users from MongoDB.
+// ============================================================
 export const getChatHistory = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { sender_id, receiver_id } = req.body;
+    const userId = req.user?.id as string;
+    const { friend_id } = req.params;
 
-    if (!sender_id || !receiver_id) {
-      return res
-        .status(400)
-        .json({ message: "sender_id and receiver_id are required" });
-    }
+    // ** Fetch chat history from the database
+    const messages = await getMessages(userId, friend_id);
 
-    const messages = await getMessages(
-      sender_id as string,
-      receiver_id as string
-    );
-
-    res
-      .status(200)
-      .json({ messages: "Chat history fetched successfully", data: messages });
+    // ✅ Success response
+    return res.status(200).json({
+      success: true,
+      message: "Chat history fetched successfully.",
+      data: messages,
+    });
   } catch (error) {
     next(error);
   }

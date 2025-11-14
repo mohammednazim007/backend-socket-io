@@ -27,7 +27,7 @@ router.post("/refresh-token", refreshToken);
 // Get currently logged-in user
 router.get("/current-user", authMiddleware, getCurrent);
 
-// Update user profile with optional image
+// ** Update user profile with optional image
 router.post(
   "/profile",
   authMiddleware,
@@ -35,7 +35,7 @@ router.post(
   updateUserProfile
 );
 
-// Logout user
+//**  Logout user
 router.get("/logout", logout);
 
 export default router;

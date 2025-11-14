@@ -9,7 +9,7 @@ import {
   sendEmailValidation,
   verifyOtpValidation,
 } from "@/modules/reset-password/email.validation";
-import { ZodError } from "zod";
+import { success, ZodError } from "zod";
 import { handleZodError } from "@/utils/handleZodError";
 
 /// ============================================================
@@ -27,7 +27,11 @@ export const sendOTP = async (
     const { email } = sendEmailValidation.parse(req.body);
     const result = await handleSendOtp(email);
 
-    res.status(200).json({ message: "OTP sent successfully", result });
+    res.status(200).json({
+      message: "OTP sent successfully",
+      email: result?.email,
+      success: true,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(400).json(handleZodError(error));
@@ -47,11 +51,14 @@ export const verifyOTPAndResetPassword = async (
   next: NextFunction
 ) => {
   try {
-    // const { email, otpCode } = req.body;
     const { email, otpCode } = verifyOtpValidation.parse(req.body);
     const result = await handleVerifyOtp(email, otpCode);
 
-    res.status(200).json({ message: "OTP verified successfully", result });
+    res.status(200).json({
+      message: "OTP verified successfully",
+      verify: result.verified,
+      success: true,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(400).json(handleZodError(error));
@@ -65,7 +72,7 @@ export const verifyOTPAndResetPassword = async (
 // PURPOSE:
 //    - Reset user's password after OTP verification is successful.
 // ============================================================
-export const resetPassword = async (
+export const changePassword = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -74,7 +81,11 @@ export const resetPassword = async (
     const { email, newPassword } = resetPasswordValidation.parse(req.body);
     const result = await handleResetPassword(email, newPassword);
 
-    res.status(200).json({ message: "Password reset successfully", result });
+    res.status(200).json({
+      message: "Password reset successfully",
+      user: result.email,
+      success: true,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(400).json(handleZodError(error));

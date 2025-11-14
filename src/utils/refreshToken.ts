@@ -25,12 +25,20 @@ export const refreshToken = async (
     const newAccessToken = jwt.sign(
       { id: user._id },
       process.env.JWT_ACCESS_SECRET as string,
-      { expiresIn: "15m" }
+      { expiresIn: "30d" }
+    );
+
+    const newRefreshToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_REFRESH_SECRET as string,
+      { expiresIn: "30d" }
     );
 
     res.cookie("accessToken", newAccessToken, getCookieOptions("access"));
-    res.json({ message: "Token refreshed" });
+    res.cookie("refreshToken", newRefreshToken, getCookieOptions("refresh"));
+
+    res.status(200).json({ message: "Tokens refreshed successfully" });
   } catch (error) {
-    res.status(403).json({ message: "Invalid refresh token" });
+    res.status(403).json({ message: "Invalid or expired refresh token" });
   }
 };

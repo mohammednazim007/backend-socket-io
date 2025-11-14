@@ -3,8 +3,8 @@ export interface IMessage {
   text?: string;
   media?: string;
   isRead: boolean;
-  sender_id: string | mongoose.Types.ObjectId;
-  receiver_id: string | mongoose.Types.ObjectId;
+  user_id: string | mongoose.Types.ObjectId;
+  friend_id: string | mongoose.Types.ObjectId;
   createdAt?: Date;
   updatedAt?: Date;
 }

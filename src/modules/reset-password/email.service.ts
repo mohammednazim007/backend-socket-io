@@ -22,10 +22,10 @@ export const handleSendOtp = async (email: string) => {
   const user = await User.findOne({ email });
   if (!user) throw new Error("User not found");
 
-  // Generate and hash OTP
+  // Generate hash OTP
   const otpCode = generateOTP();
   const hashedOtp = await bcrypt.hash(otpCode, 10);
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+  const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 5 minutes
 
   // Remove any previous OTPs for same email/purpose
   await Otp.deleteMany({ email, purpose: "reset_password" });

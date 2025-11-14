@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import { emailOtpTemplate } from "@/email-html-templete/emailTemplete";
+import { emailOtpTemplate } from "@/email-template/emailTemplate";
 dotenv.config();
 
 export const sendEmail = async (email: string, otp: string) => {
