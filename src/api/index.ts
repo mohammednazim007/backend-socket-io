@@ -1,11 +1,11 @@
-import "tsconfig-paths/register";
+import "tsconfig-paths/register"; // resolve @/ aliases
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import app from "@/app";
 import connectDB from "@/config/db";
-import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 let dbConnected = false;
 
-// Adapter to make Express app callable in serverless
+// Express adapter for Vercel serverless
 const expressHandler = (req: VercelRequest, res: VercelResponse) =>
   new Promise<void>((resolve, reject) => {
     app(req as any, res as any, (err?: any) => {
