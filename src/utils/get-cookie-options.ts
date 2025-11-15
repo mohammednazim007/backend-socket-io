@@ -5,10 +5,15 @@ export const getCookieOptions = (
 ) => {
   const isProduction = process.env.NODE_ENV === "production";
 
-  const accessMaxAge = 5 * 60 * 1000; // 15 minutes
+  // UPDATED: 15 days for access token
+  const accessMaxAge = 15 * 24 * 60 * 60 * 1000; // 15 days
+
+  const defaultRefreshMaxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+  const extendedRefreshMaxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+
   const refreshMaxAge = rememberMe
-    ? 30 * 24 * 60 * 60 * 1000 // 30 days
-    : 7 * 24 * 60 * 60 * 1000; // 7 days
+    ? extendedRefreshMaxAge // 30 days
+    : defaultRefreshMaxAge; // 7 days
 
   return {
     httpOnly: true,
