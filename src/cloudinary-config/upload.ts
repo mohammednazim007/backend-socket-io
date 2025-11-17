@@ -1,5 +1,5 @@
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "@/cloudinary/cloudinary";
+import cloudinary from "@/cloudinary-config/cloudinary-config";
 import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
 

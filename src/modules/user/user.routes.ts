@@ -9,7 +9,7 @@ import {
 import { validateRequest } from "@/middlewares/validateRequest";
 import { authMiddleware } from "@/middlewares/auth.middleware";
 import { loginSchema, registerSchema } from "@/modules/user/user.validation";
-import { upload } from "@/cloudinary/upload";
+import { upload } from "@/cloudinary-config/upload";
 import { refreshToken } from "@/utils/refreshToken";
 
 const router: Router = express.Router();

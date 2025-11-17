@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { upload } from "@/cloudinary/upload";
+import { upload } from "@/cloudinary-config/upload";
 import {
   getChatHistory,
   sendMessage,

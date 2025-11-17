@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { getReceiverSocketId, io } from "@/socket/socket-io";
-import cloudinary from "@/cloudinary/cloudinary";
+import cloudinary from "@/cloudinary-config/cloudinary-config";
 import { createMessage, getMessages } from "@/modules/message/message.service";
 import mongoose from "mongoose";
 
