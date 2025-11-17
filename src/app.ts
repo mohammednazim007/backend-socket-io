@@ -23,7 +23,6 @@ app.use(
 );
 
 // Cookie parser middleware with secure settings
-// app.use(cookieParser(process.env.COOKIE_SECRET || "fallback-secret-key"));
 app.use(cookieParser(process.env.COOKIE_SECRET || "fallback-secret-key"));
 
 app.use(express.json());

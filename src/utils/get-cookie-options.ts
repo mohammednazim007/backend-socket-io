@@ -17,9 +17,8 @@ export const getCookieOptions = (
     secure: isProduction, // Only HTTPS in production
     sameSite: isProduction ? ("none" as const) : ("lax" as const), // Cross-site cookies
     path: "/",
-    signed: false,
+    signed: true,
     domain: ".onrender.com",
     maxAge: type === "access" ? accessMaxAge : refreshMaxAge,
   };
 };
-// isProduction ? ("none" as const) : ("lax" as const)
