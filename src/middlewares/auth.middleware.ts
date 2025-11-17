@@ -57,7 +57,7 @@ export const authMiddleware = (
       // Optionally issue a new access token
       const newAccessToken = jwt.sign(
         { id: decodedRefresh.id },
-        process.env.ACCESS_TOKEN_SECRET as string,
+        process.env.JWT_ACCESS_SECRET as string,
         { expiresIn: "30d" }
       );
 
