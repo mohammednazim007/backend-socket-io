@@ -18,7 +18,7 @@ app.use(
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
     credentials: true, // Allow cookies to be sent
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
-    allowedHeaders: ["Content-Type", "Authorization", "Cookie"], // Allowed headers
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   })
 );
 
