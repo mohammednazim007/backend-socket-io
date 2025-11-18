@@ -17,13 +17,15 @@ const error_middleware_1 = require("./middlewares/error.middleware");
 const app = (0, express_1.default)();
 // CORS configuration for cookie support
 app.use((0, cors_1.default)({
-    origin: [process.env.FRONTEND_URL],
+    origin: process.env.FRONTEND_URL,
     credentials: true, // Allow cookies to be sent
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
     allowedHeaders: ["Content-Type", "Authorization", "Cookie"], // Allowed headers
 }));
 // Cookie parser middleware with secure settings
-app.use((0, cookie_parser_1.default)(process.env.COOKIE_SECRET || "fallback-secret-key"));
+// app.use(cookieParser(process.env.COOKIE_SECRET || "fallback-secret-key"));
+// ❗ do NOT use signed cookies — signed breaks cross-site cookies
+app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 // Global health route
