@@ -1,31 +1,22 @@
 {
   "compilerOptions": {
-    /* Basic Options */
     "target": "ES2020",
     "module": "commonjs",
     "rootDir": "./src",
     "outDir": "./dist",
-
-    /* Absolute import setup */
-    "baseUrl": "./src",
+    "baseUrl": "./", // <-- point to project root
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["src/*"] // <-- map to source files
     },
-
-    /* Strict Type-Checking Options */
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-
-    /* Enable source maps and declaration files */
     "sourceMap": true,
     "declaration": true,
-
-    /* Node environment */
     "lib": ["ES2020"],
     "types": ["node"]
   },
-  "include": ["src", "api"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
