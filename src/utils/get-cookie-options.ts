@@ -15,10 +15,10 @@ export const getCookieOptions = (
   return {
     httpOnly: true,
     secure: isProduction, // Only HTTPS in production
-    sameSite: isProduction ? ("none" as const) : ("lax" as const), // Cross-site cookies
+    sameSite: "none" as const, // Cross-site cookies
     path: "/",
     signed: true,
-    domain: ".onrender.com",
+    // domain: ".onrender.com",
     maxAge: type === "access" ? accessMaxAge : refreshMaxAge,
   };
 };
