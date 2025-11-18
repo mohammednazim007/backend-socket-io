@@ -17,6 +17,6 @@ export const getCookieOptions = (
     path: "/",
     signed: false, // ❗ MUST be false for cross-domain
     maxAge: type === "access" ? accessMaxAge : refreshMaxAge,
-    domain: undefined,
+    // domain: isProd ? process.env.COOKIE_DOMAIN : undefined,
   };
 };
