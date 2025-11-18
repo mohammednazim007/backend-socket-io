@@ -25,8 +25,8 @@ app.use(
 // Cookie parser middleware with secure settings
 // app.use(cookieParser(process.env.COOKIE_SECRET || "fallback-secret-key"));
 
-// ❗ do NOT use signed cookies — signed breaks cross-site cookies
 app.use(cookieParser());
+app.set("trust proxy", 1); //** trust first proxy (Render) */
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
