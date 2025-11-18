@@ -87,15 +87,13 @@ export const logout = async (
 ) => {
   try {
     const isProd = process.env.NODE_ENV === "production";
+
     const cookieOptions = {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? ("none" as const) : ("lax" as const),
       path: "/",
-      domain:
-        process.env.NODE_ENV === "production"
-          ? process.env.COOKIE_DOMAIN
-          : undefined,
+      domain: isProd ? process.env.COOKIE_DOMAIN : undefined,
     };
 
     res.clearCookie("accessToken", cookieOptions);
