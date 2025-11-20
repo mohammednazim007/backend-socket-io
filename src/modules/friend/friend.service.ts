@@ -77,7 +77,6 @@ export const sendRequest = async (senderId: string, receiverId: string) => {
   }
 
   return {
-    message: "Friend request sent successfully",
     data: { sender: updatedSender, receiver: updatedReceiver },
   };
 };
@@ -99,10 +98,7 @@ export const acceptedFriend = async (userId: string) => {
     select: "-password",
   });
 
-  return {
-    message: "Sent friend requests retrieved successfully",
-    users: populatedUser?.friends || [],
-  };
+  return populatedUser?.friends || [];
 };
 
 // ============================================================
@@ -122,10 +118,7 @@ export const getRequestedFriend = async (userId: string) => {
     select: "-password",
   });
 
-  return {
-    message: "Sent friend requests retrieved successfully",
-    users: populatedUser?.friendRequests || [],
-  };
+  return populatedUser?.friendRequests || [];
 };
 
 // ============================================================
@@ -149,10 +142,7 @@ export const getNonFriendUsers = async (userId: string) => {
     ],
   }).select("-password");
 
-  return {
-    message: "Friend retrieved successfully",
-    users: nonFriendUsers,
-  };
+  return nonFriendUsers;
 };
 
 // ============================================================
@@ -198,7 +188,6 @@ export const cancelRequest = async (senderId: string, receiverId: string) => {
   });
 
   return {
-    message: "Friend request cancelled successfully",
     data: { sender: updatedSender, receiver: updatedReceiver },
   };
 };
@@ -246,7 +235,6 @@ export const cancelRequestByMe = async (userId: string, friendId: string) => {
   });
 
   return {
-    message: "Friend request cancelled successfully",
     data: { sender: updatedSender, receiver: updatedReceiver },
   };
 };
@@ -280,5 +268,5 @@ export const acceptRequest = async (senderId: string, receiverId: string) => {
   await sender.save();
   await receiver.save();
 
-  return { message: "Friend request accepted", user: { sender, receiver } };
+  return { data: { sender, receiver } };
 };

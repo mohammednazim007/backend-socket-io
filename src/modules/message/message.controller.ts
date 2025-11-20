@@ -14,11 +14,7 @@ import mongoose from "mongoose";
 //    - Saves the message to MongoDB.
 //    - Emits the new message to the receiver in real-time if they are online.
 // ============================================================
-export const sendMessage = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const sendMessage = async (req: Request, res: Response) => {
   try {
     const { text } = req.body;
     const userId = req.user?.id as string;
@@ -60,8 +56,10 @@ export const sendMessage = async (
       message: "Message sent successfully.",
       data: newMessage,
     });
-  } catch (error) {
-    next(error);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Something went wrong";
+    res.status(400).json({ message, success: false });
   }
 };
 
@@ -74,11 +72,7 @@ export const sendMessage = async (
 //    - Retrieves all messages (both sent and received)
 //      between the two users from MongoDB.
 // ============================================================
-export const getChatHistory = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getChatHistory = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id as string;
     const { friend_id } = req.params;
@@ -92,7 +86,9 @@ export const getChatHistory = async (
       message: "Chat history fetched successfully.",
       data: messages,
     });
-  } catch (error) {
-    next(error);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Something went wrong";
+    res.status(400).json({ message, success: false });
   }
 };

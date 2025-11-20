@@ -24,7 +24,11 @@ export const register = async (
     const { name, email, password, avatar } = req.body;
     const user = await createUser(name, email, password, avatar);
 
-    res.status(201).json(user);
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      user,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(400).json(handleZodError(error));
@@ -101,9 +105,11 @@ export const getCurrent = async (
 ) => {
   try {
     const user = await getCurrentUser(req.user?.id as string);
-    res
-      .status(200)
-      .json({ message: "Current user fetched successfully", user });
+    res.status(200).json({
+      success: true,
+      message: "Current user fetched successfully",
+      user,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(400).json(handleZodError(error));
@@ -155,8 +161,11 @@ export const updateUserProfile = async (
         email: user.email,
         avatar: user.avatar,
       },
+      success: true,
     });
-  } catch (error: any) {
-    return res.status(400).json({ success: false, message: error.message });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Something went wrong";
+    res.status(400).json({ message, success: false });
   }
 };
