@@ -1,15 +1,27 @@
 export interface IUser {
-  _id?: string;
   name: string;
   email: string;
   password: string;
   avatar: string | null;
+  role?: string;
+  location?: string;
+  bio?: string;
+  phone?: string;
+  website?: string;
 
-  friends: string[]; // IDs of accepted friends
-  friendRequests: string[]; // IDs of incoming friend requests
-  sentRequests: string[]; // IDs of sent friend requests
-  blockedUsers: string[]; // IDs of blocked users
-  lastActive?: Date; // Last online timestamp
-  createdAt?: Date;
-  updatedAt?: Date;
+  twitter?: string;
+  github?: string;
+  linkedin?: string;
+  marketingEmails?: boolean;
+  securityEmails?: boolean;
+  productUpdates?: boolean;
+
+  isFriend?: boolean;
+  friends?: string[];
+  friendRequests?: string[];
+  sentRequests?: string[];
+  blockedUsers?: string[];
+  lastActive?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

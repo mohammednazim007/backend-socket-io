@@ -7,9 +7,9 @@ import {
 import {
   resetPasswordValidation,
   sendEmailValidation,
-  verifyOtpValidation,
+  validation_otp,
 } from "@/modules/reset-password/email.validation";
-import { success, ZodError } from "zod";
+import { ZodError } from "zod";
 import { handleZodError } from "@/utils/handleZodError";
 
 /// ============================================================
@@ -51,8 +51,9 @@ export const verifyOTPAndResetPassword = async (
   next: NextFunction
 ) => {
   try {
-    const { email, otpCode } = verifyOtpValidation.parse(req.body);
+    const { email, otpCode } = validation_otp.parse(req.body);
     const result = await handleVerifyOtp(email, otpCode);
+    console.log(result, email, otpCode);
 
     res.status(200).json({
       message: "OTP verified successfully",

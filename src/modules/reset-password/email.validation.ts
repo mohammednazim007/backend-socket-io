@@ -6,7 +6,7 @@ export const sendEmailValidation = z.object({
 });
 
 // For verifying OTP and resetting password
-export const verifyOtpValidation = z.object({
+export const validation_otp = z.object({
   email: z.string().email("Invalid email address"),
   otpCode: z
     .string()
@@ -21,5 +21,5 @@ export const resetPasswordValidation = z.object({
 });
 
 export type SendEmailInput = z.infer<typeof sendEmailValidation>;
-export type VerifyOtpInput = z.infer<typeof verifyOtpValidation>;
+export type VerifyOtpInput = z.infer<typeof validation_otp>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordValidation>;
