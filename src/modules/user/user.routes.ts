@@ -33,6 +33,8 @@ router.post(
   updateUserProfile
 );
 
+// ** Update
+
 //**  Logout user
 router.get("/logout", logout);
 

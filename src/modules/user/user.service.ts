@@ -1,6 +1,7 @@
 import User from "./user.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { IUpdateProfile } from "./user.interface";
 
 // ============================================================
 // ✅ METHOD: POST
@@ -73,31 +74,72 @@ export const loginUser = async (email: string, password: string) => {
 // CONTROLLER:
 //    - Called by `updateUserProfile` in `user.controller.ts`
 // ============================================================
-export const updateProfile = async (
-  userId: string,
-  file?: Express.Multer.File & { path?: string; filename?: string },
-  currentPassword?: string,
-  newPassword?: string,
-  name?: string
-) => {
+// export const updateProfile = async (
+//   userId: string,
+//   file?: Express.Multer.File & { path?: string; filename?: string },
+//   currentPassword?: string,
+//   newPassword?: string,
+//   name?: string
+// ) => {
+//   const user = await User.findById(userId);
+//   if (!user) {
+//     throw new Error("User not found");
+//   }
+
+//   if (name) user.name = name;
+
+//   if (currentPassword && newPassword) {
+//     const isMatch = await bcrypt.compare(currentPassword, user.password);
+//     if (!isMatch) throw new Error("Current password is incorrect");
+//     user.password = await bcrypt.hash(newPassword, 10);
+//   }
+
+//   if (file?.path) user.avatar = file.path;
+
+//   await user.save();
+//   return user;
+// };
+
+export const updateProfile = async (userId: string, data: IUpdateProfile) => {
   const user = await User.findById(userId);
-  if (!user) {
-    throw new Error("User not found");
-  }
+  if (!user) throw new Error("User not found");
 
+  const {
+    name,
+    role,
+    location,
+    website,
+    bio,
+    twitter,
+    github,
+    linkedin,
+    file,
+  } = data;
+
+  // Update profile fields
   if (name) user.name = name;
+  if (role) user.role = role;
+  if (location) user.location = location;
+  if (website) user.website = website;
+  if (bio) user.bio = bio;
+  if (twitter) user.twitter = twitter;
+  if (github) user.github = github;
+  if (linkedin) user.linkedin = linkedin;
 
-  if (currentPassword && newPassword) {
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) throw new Error("Current password is incorrect");
-    user.password = await bcrypt.hash(newPassword, 10);
+  // Update avatar
+  if (file?.path) {
+    user.avatar = file.path;
   }
-
-  if (file?.path) user.avatar = file.path;
 
   await user.save();
   return user;
 };
+
+//  if (currentPassword && newPassword) {
+//    const isMatch = await bcrypt.compare(currentPassword, user.password);
+//    if (!isMatch) throw new Error("Current password is incorrect");
+//    user.password = await bcrypt.hash(newPassword, 10);
+//  }
 
 // ============================================================
 // ✅ METHOD: GET

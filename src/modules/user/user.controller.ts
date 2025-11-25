@@ -128,6 +128,50 @@ export const getCurrent = async (
 // CONTROLLER:
 //    - `updateUserProfile` calls `updateProfile` service and returns updated user.
 // ============================================================
+// export const updateUserProfile = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const userId = (req as any).user?.id;
+//     if (!userId) {
+//       return res.status(401).json({ success: false, message: "Unauthorized" });
+//     }
+
+//     const { name, role, location, website, bio, twitter, github, linkedin } =
+//       req.body;
+//     const file = req.file as Express.Multer.File & {
+//       path?: string;
+//       filename?: string;
+//     };
+
+//     const updateFields={
+//       name,
+//       role,
+//       location,
+//       website,
+//       bio,
+//       twitter,
+//       github,
+//       linkedin,
+//       file
+//     }
+
+//     const user = await updateProfile(updateFields);
+
+//     return res.status(200).json({
+//       message: "Profile updated successfully",
+//       user,
+//       success: true,
+//     });
+//   } catch (error: unknown) {
+//     const message =
+//       error instanceof Error ? error.message : "Something went wrong";
+//     res.status(400).json({ message, success: false });
+//   }
+// };
+
 export const updateUserProfile = async (
   req: Request,
   res: Response,
@@ -139,33 +183,35 @@ export const updateUserProfile = async (
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const { name, currentPassword, newPassword } = req.body;
-    const file = req.file as Express.Multer.File & {
-      path?: string;
-      filename?: string;
+    const { name, role, location, website, bio, twitter, github, linkedin } =
+      req.body;
+
+    const file = req.file as
+      | (Express.Multer.File & { path?: string; filename?: string })
+      | undefined;
+
+    const updateData = {
+      name,
+      role,
+      location,
+      website,
+      bio,
+      twitter,
+      github,
+      linkedin,
+      file,
     };
 
-    const user = await updateProfile(
-      userId,
-      file,
-      currentPassword,
-      newPassword,
-      name
-    );
+    const updatedUser = await updateProfile(userId, updateData);
 
     return res.status(200).json({
-      message: "Profile updated successfully",
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-      },
       success: true,
+      message: "Profile updated successfully",
+      user: updatedUser,
     });
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Something went wrong";
-    res.status(400).json({ message, success: false });
+    return res.status(400).json({ success: false, message });
   }
 };

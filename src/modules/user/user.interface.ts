@@ -25,3 +25,15 @@ export interface IUser {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface IUpdateProfile {
+  name?: string;
+  role?: string;
+  location?: string;
+  website?: string;
+  bio?: string;
+  twitter?: string;
+  github?: string;
+  linkedin?: string;
+  file?: Express.Multer.File & { path?: string; filename?: string };
+}
