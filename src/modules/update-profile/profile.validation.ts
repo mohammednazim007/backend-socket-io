@@ -6,6 +6,7 @@ export const securityValidation = z.object({
   currentPassword: z.string().regex(passwordRegex, "Password is too weak"),
   twoFactorEnabled: z.boolean().optional(),
   confirmPassword: z.string().optional(),
+  lastPasswordChange: z.date().optional(),
 });
 
 export type SecuritySchemaType = z.infer<typeof securityValidation>;
